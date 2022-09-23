@@ -3,6 +3,7 @@
 const path = require('path')
 const AutoLoad = require('@fastify/autoload')
 const initialize = require('./utils/dbinitialize')
+const dbTask = require('./utils/')
 require('dotenv').config()
 
 module.exports = async function (fastify, opts) {
