@@ -2,11 +2,12 @@
 
 const path = require('path')
 const AutoLoad = require('@fastify/autoload')
+const initialize = require('./utils/dbinitialize')
 require('dotenv').config()
 
 module.exports = async function (fastify, opts) {
   // Place here your custom code!
-
+  initialize()
   // Do not touch the following lines
 
   // This loads all plugins defined in plugins

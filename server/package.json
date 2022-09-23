@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tap \"test/**/*.test.js\"",
-    "start": "fastify start -w -l info app.js",
+    "start": "fastify start -w --ignore-watch 'db.sqlite' -l info app.js",
     "dev": "fastify start -w -l info -P app.js"
   },
   "keywords": [],
@@ -17,12 +17,12 @@
   "dependencies": {
     "@fastify/autoload": "^5.0.0",
     "@fastify/sensible": "^4.1.0",
+    "better-sqlite3": "^7.6.2",
     "dotenv": "^16.0.2",
     "fastify": "^4.0.0",
     "fastify-cli": "^4.4.0",
     "fastify-plugin": "^3.0.0",
-    "got": "11.8.5",
-    "sqlite3": "^5.1.1"
+    "got": "11.8.5"
   },
   "devDependencies": {
     "tap": "^16.1.0"

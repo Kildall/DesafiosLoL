@@ -45,9 +45,17 @@ module.exports = async function (fastify, opts) {
     fastify.get('/:id', idSchema, async function (request, reply) {
         const  { id } =  request.params;
         
+        let query = db.prepare(`SELECT * FROM challenges WHERE id=${id}`);
+        let data = query.get()
+        if(data) return data
+
         try {
-            let data = await got(`https://la2.api.riotgames.com/lol/challenges/v1/challenges/${id}/config`, options).json()
-            data.localizedNames = data.localizedNames.es_AR
+            let retrieved = await got(`https://la2.api.riotgames.com/lol/challenges/v1/challenges/${id}/config`, options).json()
+            retrieved.localizedNames = retrieved.localizedNames.es_AR
+            db.prepare('INSERT INTO challenges VALUES (?,?,?,?,?,?)').run(retrieved.id, retrieved.localizedNames.name, 
+                retrieved.localizedNames.description, retrieved.localizedNames.shortDescription,
+                retrieved.state, retrieved.leaderboard ? 1 : 0)
+            data = query.get()
             return data
         } catch (err) {
             console.error(err)
