@@ -8,6 +8,12 @@ const ENV = process.env.NODE_ENV || 'dev'
 module.exports = async function (fastify, opts) {
     const { notFound } = fastify.httpErrors
 
+    const options = {
+        headers: {
+            'X-Riot-Token': process.env.RIOT_API_KEY
+        }
+    };
+
     const idSchema = {
         schema: {
             params: {
@@ -23,28 +29,29 @@ module.exports = async function (fastify, opts) {
         }
     }
 
-    if(ENV === 'dev'){
-        fastify.get('/', async function (request, reply) {
-            await initialize()
-            const data = await got('https://la2.api.riotgames.com/lol/challenges/v1/challenges/config').json()
-            for (const challenge in data) {
-            if (challenge.state !== 'ENABLED') {
-                
-            }
-            }
-            return {};
+    
+    fastify.get('/', async function (request, reply) {
+        await initialize()
+        let challenges = []
+        const data = await got('https://la2.api.riotgames.com/lol/challenges/v1/challenges/config', options).json()
+        data.forEach((challenge) => {
+            challenge.localizedNames = challenge.localizedNames.es_AR
+            challenges.push(challenge)
         })
-    }
+        return challenges;
+    })
+    
 
     fastify.get('/:id', idSchema, async function (request, reply) {
-        const  { id } =  request.params.id;
-        const options = {
-            headers: {
-                'X-Riot-Token': process.env.RIOT_API_KEY
-            }
-        };
-        const retrieved = await got(`https://la2.api.riotgames.com/lol/challenges/v1/challenges/${id}/onfig`, options).json()
+        const  { id } =  request.params;
         
-        return retrieved
+        try {
+            let data = await got(`https://la2.api.riotgames.com/lol/challenges/v1/challenges/${id}/config`, options).json()
+            data.localizedNames = data.localizedNames.es_AR
+            return data
+        } catch (err) {
+            console.error(err)
+            return notFound
+        }
     })
 }
