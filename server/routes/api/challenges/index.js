@@ -31,13 +31,8 @@ module.exports = async function (fastify, opts) {
 
     
     fastify.get('/', async function (request, reply) {
-        await initialize()
-        let challenges = []
-        const data = await got('https://la2.api.riotgames.com/lol/challenges/v1/challenges/config', options).json()
-        data.forEach((challenge) => {
-            challenge.localizedNames = challenge.localizedNames.es_AR
-            challenges.push(challenge)
-        })
+        let query = db.prepare(`SELECT * FROM challenges`)
+        let results = query.all()
         return challenges;
     })
     
@@ -47,7 +42,8 @@ module.exports = async function (fastify, opts) {
         
         let query = db.prepare(`SELECT * FROM challenges WHERE id=${id}`);
         let data = query.get()
-        if(data) return data
+        if(data)
+            return data
 
         try {
             let retrieved = await got(`https://la2.api.riotgames.com/lol/challenges/v1/challenges/${id}/config`, options).json()
